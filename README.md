@@ -1,11 +1,13 @@
 # Frequency Planner
 ### Configuration
-Add files in `sites/` to define sites. See `sites/example.json`
+1. Add files in `sites/` to define sites. See `sites/example.json`
 
-Edit `config.json` to define your platforms and set the webserver `(address):port`
+2. Edit `config.json` to define your platforms and set the webserver `(address):port`
 
 ### Execution
-`go run .`
+1. [Install go](https://go.dev/doc/install)
+
+2. `go run .`
 
 ### Compiling into a binary
 `GOOS=linux GOARCH=amd64 go build .`
