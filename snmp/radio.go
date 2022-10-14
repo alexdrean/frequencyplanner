@@ -3,6 +3,7 @@ package snmp
 import (
 	"fmt"
 	"github.com/gosnmp/gosnmp"
+	"log"
 	"time"
 )
 
@@ -17,14 +18,14 @@ func GetNext(ip string, community string, oids []string, c chan []string) {
 	}
 	err := handle.Connect()
 	if err != nil {
-		fmt.Println(ip, err)
+		log.Println(ip, err)
 		c <- nil
 		return
 	}
 	defer handle.Conn.Close()
 	results, err := handle.GetNext(oids)
 	if err != nil {
-		fmt.Println(ip, err)
+		log.Println(ip, err)
 		c <- nil
 		return
 	}

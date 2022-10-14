@@ -26,7 +26,7 @@ func (r *RequestHandler) Respond(w http.ResponseWriter, nav string, frequencyTab
 }
 
 func (r *RequestHandler) ServeHTTP(w http.ResponseWriter, request *http.Request) {
-	fmt.Printf("%s %s\n", request.RemoteAddr, request.URL.String())
+	log.Printf("%s %s\n", request.RemoteAddr, request.URL.String())
 	nav, err := getNav()
 	if err != nil {
 		writeError(w, "could not get nav", err)
