@@ -12,12 +12,15 @@ import (
 )
 
 type RequestHandler struct {
-	template string
-	config   *Config
+	config *Config
 }
 
 func (r *RequestHandler) Respond(w http.ResponseWriter, nav string, frequencyTable string) {
-	body := strings.ReplaceAll(r.template, "<nav/>", nav)
+	htmlTemplate, err := ioutil.ReadFile("index.html")
+	if err != nil {
+		panic(fmt.Errorf("could not read index.html: %s", err))
+	}
+	body := strings.ReplaceAll(string(htmlTemplate), "<nav/>", nav)
 	body = strings.ReplaceAll(body, "<frequencytable/>", frequencyTable)
 	write(w, body)
 }

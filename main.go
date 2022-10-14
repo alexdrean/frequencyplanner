@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -11,11 +10,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	htmlTemplate, err := ioutil.ReadFile("index.html")
-	if err != nil {
-		panic(fmt.Errorf("could not read index.html: %s", err))
-	}
-	handler := &RequestHandler{string(htmlTemplate), config}
+	handler := &RequestHandler{config}
 	fmt.Printf("webserver listening on %s\n", config.Listen)
 	err = http.ListenAndServe(config.Listen, handler)
 	if err != nil {
