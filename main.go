@@ -14,6 +14,7 @@ import (
 func main() {
 	channelSigterm := make(chan os.Signal)
 	signal.Notify(channelSigterm, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(channelSigterm, os.Interrupt, syscall.SIGINT)
 
 	config, err := loadConfig("config.json")
 	if err != nil {
