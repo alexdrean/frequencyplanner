@@ -32,6 +32,7 @@ func (s *Site) getFrequencyData() (map[string][]string, []string, error) {
 			header = strings.ReplaceAll(header, "oid:"+oid, res[i])
 			content = strings.ReplaceAll(content, "oid:"+oid, res[i])
 		}
+		content = strings.ReplaceAll(content, "deviceip", s.Radios[i].Ip)
 		if results[header] == nil {
 			results[header] = []string{}
 		}
