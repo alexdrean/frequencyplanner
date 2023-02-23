@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"frequencyplanner/snmp"
 	"os"
 	"regexp"
 )
@@ -25,19 +26,26 @@ type Config struct {
 type Platform struct {
 	Header  string `json:"header"`
 	Content string `json:"content"`
-	oids    []string
+	oids    []snmp.Oid
 }
 
-func (p *Platform) parseOIDs() ([]string, error) {
-	r, err := regexp.Compile("oid:[0-9.]+")
+func (p *Platform) parseOIDs() ([]snmp.Oid, error) {
+	r, err := regexp.Compile("(oid|oidcount):([0-9.]+)")
 	if err != nil {
 		return nil, fmt.Errorf("regexp returned: %s", err)
 	}
-	oids := r.FindAllString(p.Header+"\n"+p.Content, -1)
-	for i, oid := range oids {
-		oids[i] = oid[4:]
+	oids := r.FindAllStringSubmatch(p.Header+"\n"+p.Content, -1)
+	res := make([]snmp.Oid, len(oids))
+	for i, o := range oids {
+		var kind snmp.OidKind
+		if o[1] == "oid" {
+			kind = snmp.OidGet
+		} else {
+			kind = snmp.OidCount
+		}
+		res[i] = snmp.Oid{Oid: o[2], Kind: kind}
 	}
-	return oids, nil
+	return res, nil
 }
 
 func loadConfig(path string) (*Config, error) {

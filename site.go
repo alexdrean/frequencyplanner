@@ -7,16 +7,16 @@ import (
 )
 
 func (s *Site) getFrequencyData() (map[string][]string, []string, error) {
-	channels := make([]chan []string, len(s.Radios))
+	channels := make([]chan []snmp.OidResult, len(s.Radios))
 	var errs []string
 	for i, radio := range s.Radios {
-		channels[i] = make(chan []string)
+		channels[i] = make(chan []snmp.OidResult)
 		platform := s.config.Platforms[radio.Platform]
 		if platform == nil {
 			errs = append(errs, "platform '"+radio.Platform+"' not defined in config.json")
 			continue
 		}
-		go snmp.GetNext(radio.Ip, s.Community, platform.oids, channels[i])
+		go snmp.Get(radio.Ip, s.Community, platform.oids, channels[i])
 	}
 	results := map[string][]string{}
 	for i, channel := range channels {
@@ -28,9 +28,15 @@ func (s *Site) getFrequencyData() (map[string][]string, []string, error) {
 		platform := s.config.Platforms[s.Radios[i].Platform]
 		header := platform.Header
 		content := platform.Content
-		for i, oid := range platform.oids {
-			header = strings.ReplaceAll(header, "oid:"+oid, res[i])
-			content = strings.ReplaceAll(content, "oid:"+oid, res[i])
+		for _, res := range res {
+			var name string
+			if res.Oid.Kind == snmp.OidCount {
+				name = "oidcount:" + res.Oid.Oid
+			} else {
+				name = "oid:" + res.Oid.Oid
+			}
+			header = strings.ReplaceAll(header, name, res.Result)
+			content = strings.ReplaceAll(content, name, res.Result)
 		}
 		content = strings.ReplaceAll(content, "deviceip", s.Radios[i].Ip)
 		if results[header] == nil {
